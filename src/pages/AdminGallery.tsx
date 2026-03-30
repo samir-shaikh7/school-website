@@ -5,6 +5,7 @@ const AdminGallery = () => {
   const [images, setImages] = useState<any[]>([]);
   const [file, setFile] = useState<any>(null);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,112 +18,69 @@ const AdminGallery = () => {
     setImages(data || []);
   };
 
-  // 🔥 FAST UPLOAD
   const handleUpload = async () => {
     if (!file) return null;
 
     const fileName = Date.now() + "-" + file.name;
 
-    const { error } = await supabase.storage
-      .from("gallery")
-      .upload(fileName, file);
-
-    if (error) {
-      alert("Upload failed");
-      return null;
-    }
+    await supabase.storage.from("gallery").upload(fileName, file);
 
     return supabase.storage
       .from("gallery")
       .getPublicUrl(fileName).data.publicUrl;
   };
 
-  // 🔥 MAIN FIX
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    if (!title) {
-      alert("Title required");
-      return;
-    }
+    if (!title) return alert("Title required");
 
     setLoading(true);
 
     let image_url = null;
+    if (file) image_url = await handleUpload();
 
-    if (file) {
-      image_url = await handleUpload();
+    if (editId) {
+      const updateData: any = { title, description };
+
+      if (image_url) updateData.image_url = image_url;
+
+      await supabase.from("gallery").update(updateData).eq("id", editId);
+
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === editId ? { ...img, ...updateData } : img
+        )
+      );
+
+      setEditId(null);
+
+    } else {
+      if (!image_url) return alert("Select image");
+
+      const { data } = await supabase
+        .from("gallery")
+        .insert([{ image_url, title, description }])
+        .select()
+        .single();
+
+      setImages((prev) => [data, ...prev]);
     }
 
-    try {
-      if (editId) {
-        const updateData: any = { title };
-
-        if (image_url) {
-          updateData.image_url = image_url;
-        }
-
-        const { error } = await supabase
-          .from("gallery")
-          .update(updateData)
-          .eq("id", editId);
-
-        if (error) throw error;
-
-        // 🔥 INSTANT UPDATE UI
-        setImages((prev) =>
-          prev.map((img) =>
-            img.id === editId
-              ? { ...img, ...updateData }
-              : img
-          )
-        );
-
-        alert("Updated");
-        setEditId(null);
-
-      } else {
-        if (!image_url) {
-          alert("Select image");
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from("gallery")
-          .insert([{ image_url, title }])
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        // 🔥 INSTANT ADD (NO FETCH)
-        setImages((prev) => [data, ...prev]);
-
-        alert("Added");
-      }
-
-      setFile(null);
-      setTitle("");
-
-    } catch (err) {
-      console.error(err);
-      alert("Error");
-    } finally {
-      setLoading(false);
-    }
+    setFile(null);
+    setTitle("");
+    setDescription("");
+    setLoading(false);
   };
 
   const handleEdit = (img: any) => {
     setTitle(img.title);
+    setDescription(img.description);
     setEditId(img.id);
   };
 
   const deleteImage = async (id: number) => {
-    if (!window.confirm("Delete?")) return;
-
     await supabase.from("gallery").delete().eq("id", id);
-
-    // 🔥 INSTANT REMOVE
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
@@ -131,16 +89,20 @@ const AdminGallery = () => {
 
       <h1 className="text-2xl font-bold mb-6">Manage Gallery</h1>
 
-      {/* FORM */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-md mb-8 space-y-4"
-      >
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4">
+
         <input
           type="text"
-          placeholder="Image Title"
+          placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
+
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           className="w-full border p-2 rounded"
         />
 
@@ -149,52 +111,35 @@ const AdminGallery = () => {
           onChange={(e) => setFile(e.target.files?.[0])}
         />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          {loading
-            ? "Processing..."
-            : editId
-            ? "Update Image"
-            : "Upload Image"}
+        <button className="bg-blue-500 text-white px-4 py-2 rounded">
+          {loading ? "Loading..." : editId ? "Update" : "Upload"}
         </button>
+
       </form>
 
-      {loading && <p>Loading...</p>}
-
-      {/* IMAGES */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6 mt-8">
         {images.map((img) => (
-          <div
-            key={img.id}
-            className="bg-white rounded-xl shadow-md overflow-hidden"
-          >
-            <img
-              src={img.image_url}
-              className="w-full h-40 object-cover"
-            />
+          <div key={img.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+
+            <img src={img.image_url} className="h-40 w-full object-cover" />
 
             <div className="p-4">
               <h3 className="font-semibold">{img.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                {img.description}
+              </p>
 
               <div className="flex gap-2 mt-4">
-                <button
-                  onClick={() => handleEdit(img)}
-                  className="bg-yellow-400 px-3 py-1 rounded"
-                >
+                <button onClick={() => handleEdit(img)} className="bg-yellow-400 px-3 py-1 rounded">
                   Edit
                 </button>
 
-                <button
-                  onClick={() => deleteImage(img.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
-                >
+                <button onClick={() => deleteImage(img.id)} className="bg-red-500 text-white px-3 py-1 rounded">
                   Delete
                 </button>
               </div>
             </div>
+
           </div>
         ))}
       </div>

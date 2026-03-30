@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen, GraduationCap, Users, Award, Library, Monitor, TreePine, FlaskConical, Tv, Bell, CalendarDays, Megaphone } from "lucide-react";
-import heroCampus from "@/assets/hero-campus.jpg";
+import heroCampus from "@/assets/hero-campus.webp";
 
 
 const stats = [
@@ -60,8 +60,7 @@ const Index = () => {
       {/* Hero */}
 
 
-      <section className="relative h-[85vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-
+<section className="relative h-[55vh] md:h-[85vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <motion.img
           src={heroCampus}
@@ -73,20 +72,18 @@ const Index = () => {
         />
 
         {/* Overlay */}
-        <div className="absolute inset-0 hero-overlay" />
-
-        {/* Content */}
+<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/40" />   
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center px-4 max-w-4xl mx-auto"
         >
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-4 leading-tight">
+          <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-4 leading-tight">
             Welcome to Shri Basweshwar Education Campus
           </h1>
 
-          <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+          <p className="text-sl md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
             Providing Quality Education in Nanded District, Maharashtra
           </p>
 

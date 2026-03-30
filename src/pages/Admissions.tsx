@@ -3,7 +3,7 @@ import { supabase } from "@/supabaseClient";
 import { CheckCircle } from "lucide-react";
 
 const Admissions = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ const Admissions = () => {
     try {
       const { data, error } = await supabase
         .from("admissions_content")
-        .select("*");
+        .select("id, section, title, content"); // 🔥 optimized
 
       if (error) throw error;
 
@@ -26,15 +26,24 @@ const Admissions = () => {
     }
   };
 
-  const getSection = (name) =>
+  // 🔥 SCROLL FIX
+  useEffect(() => {
+    if (!loading) {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 50);
+    }
+  }, [loading]);
+
+  const getSection = (name: string) =>
     data.find((item) => item.section === name);
 
   const process = getSection("process");
   const documents = getSection("documents");
   const dates = getSection("dates");
 
-  // 🔥 CLEAN FIX (NO BRACKETS / NO QUOTES)
-  const cleanArray = (val) => {
+  // CLEAN ARRAY
+  const cleanArray = (val: any) => {
     if (Array.isArray(val)) return val;
 
     if (typeof val === "string") {
@@ -53,8 +62,20 @@ const Admissions = () => {
     return [];
   };
 
+  // 🔥 PREMIUM LOADING (Skeleton UI)
   if (loading) {
-    return <p className="p-10 text-center">Loading...</p>;
+    return (
+      <div className="p-10 max-w-4xl mx-auto animate-pulse space-y-6">
+        <div className="h-10 bg-gray-200 rounded w-1/3 mx-auto"></div>
+
+        <div className="h-40 bg-gray-200 rounded"></div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="h-32 bg-gray-200 rounded"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -76,8 +97,8 @@ const Admissions = () => {
         <div className="container mx-auto px-4 max-w-4xl">
 
           {/* PROCESS */}
-          <div className="rounded-xl bg-card border border-border p-10 shadow-sm mb-10">
-            <h2 className="font-heading text-2xl font-bold text-foreground mb-6">
+          <div className="rounded-2xl bg-white p-10 shadow-md mb-10">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
               {process?.title || "Admission Process"}
             </h2>
 
@@ -85,7 +106,7 @@ const Admissions = () => {
               {cleanArray(process?.content).map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <p className="text-muted-foreground">{step}</p>
+                  <p className="text-gray-600">{step}</p>
                 </div>
               ))}
             </div>
@@ -94,12 +115,12 @@ const Admissions = () => {
           <div className="grid md:grid-cols-2 gap-8">
 
             {/* DOCUMENTS */}
-            <div className="rounded-xl bg-card border border-border p-8 shadow-sm">
-              <h3 className="font-heading text-xl font-bold text-foreground mb-4">
+            <div className="rounded-2xl bg-white p-8 shadow-md">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">
                 {documents?.title || "Required Documents"}
               </h3>
 
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm text-gray-600">
                 {cleanArray(documents?.content).map((item, i) => (
                   <li key={i}>• {item}</li>
                 ))}
@@ -107,23 +128,24 @@ const Admissions = () => {
             </div>
 
             {/* DATES */}
-            <div className="rounded-xl bg-card border border-border p-8 shadow-sm">
-              <h3 className="font-heading text-xl font-bold text-foreground mb-4">
+            <div className="rounded-2xl bg-white p-8 shadow-md">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">
                 {dates?.title || "Important Dates"}
               </h3>
 
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm text-gray-600">
                 {cleanArray(dates?.content).map((item, i) => (
                   <li key={i}>• {item}</li>
                 ))}
               </ul>
 
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="mt-4 text-sm text-gray-500">
                 For queries, contact the school office or call us.
               </p>
             </div>
 
           </div>
+
         </div>
       </section>
     </div>

@@ -60,7 +60,7 @@ const Events = () => {
                 />
               )}
 
-              <div className="p-4">
+              <div className="p-4 overflow-hidden">
                 <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
                   {e.date}
                 </span>
@@ -69,9 +69,16 @@ const Events = () => {
                   {e.title}
                 </h3>
 
-                <p className="text-sm text-gray-600 mt-1">
-                  {e.description}
-                </p>
+<p
+  className="text-sm text-gray-600 mt-1 overflow-hidden"
+  style={{
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+  }}
+>
+  {e.description}
+</p>
               </div>
 
             </div>
@@ -93,7 +100,7 @@ const Events = () => {
                 />
               )}
 
-              <div className="p-4">
+              <div className="p-4 overflow-hidden">
                 <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
                   {e.date}
                 </span>
@@ -102,9 +109,16 @@ const Events = () => {
                   {e.title}
                 </h3>
 
-                <p className="text-sm text-gray-600 mt-1">
-                  {e.description}
-                </p>
+<p
+  className="text-sm text-gray-600 mt-1 overflow-hidden"
+  style={{
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+  }}
+>
+  {e.description}
+</p>
               </div>
 
             </div>

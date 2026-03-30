@@ -23,6 +23,8 @@ import Staff from "./pages/Staff.tsx";
 import Contact from "./pages/Contact.tsx";
 import AdminGallery from "@/pages/AdminGallery";
 import EventDetails from "./pages/EventDetails.tsx";
+import GalleryDetails from "./pages/GalleryDetails.tsx";
+import ScrollToTop from "./components/ScrollToTop";
 import AdminAdmissions from "@/pages/AdminAdmissions";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -34,6 +36,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
 
         <Routes>
 
@@ -49,6 +52,7 @@ const App = () => (
             <Route path="gallery" element={<Gallery />} />
             <Route path="events" element={<Events />} />
             <Route path="events/:id" element={<EventDetails />} />
+            <Route path="/gallery/:id" element={<GalleryDetails />} />
             <Route path="staff" element={<Staff />} />
             <Route path="contact" element={<Contact />} />
             <Route path="login" element={<Login />} />
