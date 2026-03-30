@@ -60,7 +60,7 @@ const Index = () => {
       {/* Hero */}
 
 
-<section className="relative h-[30vh] md:h-[85vh] flex items-center justify-center overflow-hidden">
+<section className="relative h-[40vh] md:h-[85vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <motion.img
           src={heroCampus}
